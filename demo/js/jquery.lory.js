@@ -3,10 +3,10 @@
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
-	else if(typeof exports === 'object')
-		exports["lory"] = factory();
-	else
-		root["lory"] = factory();
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -54,15 +54,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* globals $ */
-
 	'use strict';
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	var _lory = __webpack_require__(1);
 
-	var _loryJs = __webpack_require__(1);
+	var _lory2 = _interopRequireDefault(_lory);
 
-	var _loryJs2 = _interopRequireDefault(_loryJs);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	$.fn.lory = function (options) {
 	    return this.each(function () {
@@ -70,40 +68,39 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (!$.data(this, 'lory')) {
 	            instanceOptions = $.extend({}, options, $(this).data());
-	            $.data(this, 'lory', (0, _loryJs2['default'])(this, instanceOptions));
+	            $.data(this, 'lory', (0, _lory2.default)(this, instanceOptions));
 	        }
 	    });
-	};
+	}; /* globals $ */
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* globals jQuery */
-
 	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	exports['default'] = lory;
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.lory = lory;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	var _detectPrefixes = __webpack_require__(2);
 
-	var _utilsDetectPrefixesJs = __webpack_require__(2);
+	var _detectPrefixes2 = _interopRequireDefault(_detectPrefixes);
 
-	var _utilsDetectPrefixesJs2 = _interopRequireDefault(_utilsDetectPrefixesJs);
+	var _dispatchEvent = __webpack_require__(3);
 
-	var _utilsDispatchEventJs = __webpack_require__(3);
+	var _dispatchEvent2 = _interopRequireDefault(_dispatchEvent);
 
-	var _utilsDispatchEventJs2 = _interopRequireDefault(_utilsDispatchEventJs);
+	var _defaults = __webpack_require__(5);
 
-	var _defaultsJs = __webpack_require__(5);
+	var _defaults2 = _interopRequireDefault(_defaults);
 
-	var _defaultsJs2 = _interopRequireDefault(_defaultsJs);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _instanceof(left, right) { if (right != null && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return left instanceof right; } } /* globals jQuery */
 
 	var slice = Array.prototype.slice;
 
@@ -129,7 +126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * if object is jQuery convert to native DOM element
 	     */
-	    if (typeof jQuery !== 'undefined' && slider instanceof jQuery) {
+	    if (typeof jQuery !== 'undefined' && _instanceof(slider, jQuery)) {
 	        slider = slider[0];
 	    }
 
@@ -186,7 +183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return {[type]} [description]
 	     */
 	    function dispatchSliderEvent(phase, type, detail) {
-	        (0, _utilsDispatchEventJs2['default'])(slider, phase + '.lory.' + type, detail);
+	        (0, _dispatchEvent2.default)(slider, phase + '.lory.' + type, detail);
 	    }
 
 	    /**
@@ -202,7 +199,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (style) {
 	            style[prefixes.transition + 'TimingFunction'] = ease;
 	            style[prefixes.transition + 'Duration'] = duration + 'ms';
-	            style[prefixes.transform] = 'translate3d(' + to + 'px, 0, 0)';
+
+	            if (prefixes.hasTranslate3d) {
+	                style[prefixes.transform] = 'translate3d(' + to + 'px, 0, 0)';
+	            } else {
+	                style[prefixes.transform] = 'translate(' + to + 'px, 0)';
+	            }
 	        }
 	    }
 
@@ -306,8 +308,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function setup() {
 	        dispatchSliderEvent('before', 'init');
 
-	        prefixes = (0, _utilsDetectPrefixesJs2['default'])();
-	        options = _extends({}, _defaultsJs2['default'], opts);
+	        prefixes = (0, _detectPrefixes2.default)();
+	        options = _extends({}, _defaults2.default, opts);
 
 	        var _options4 = options;
 	        var classNameFrame = _options4.classNameFrame;
@@ -601,29 +603,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 
-	module.exports = exports['default'];
-
 /***/ },
 /* 2 */
 /***/ function(module, exports) {
 
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = detectPrefixes;
 	/**
 	 * Detecting prefixes for saving time and bytes
 	 */
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	exports['default'] = detectPrefixes;
-
 	function detectPrefixes() {
 	    var transform = undefined;
 	    var transition = undefined;
 	    var transitionEnd = undefined;
+	    var hasTranslate3d = undefined;
 
 	    (function () {
-	        var style = document.createElement('_').style;
+	        var el = document.createElement('_');
+	        var style = el.style;
 
 	        var prop = undefined;
 
@@ -648,16 +649,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (style[prop = 'transform'] === '') {
 	            transform = prop;
 	        }
+
+	        document.body.insertBefore(el, null);
+	        style[transform] = 'translate3d(0, 0, 0)';
+	        hasTranslate3d = !!global.getComputedStyle(el).getPropertyValue(transform);
+	        document.body.removeChild(el);
 	    })();
 
 	    return {
 	        transform: transform,
 	        transition: transition,
-	        transitionEnd: transitionEnd
+	        transitionEnd: transitionEnd,
+	        hasTranslate3d: hasTranslate3d
 	    };
 	}
-
-	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 3 */
@@ -665,16 +671,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports['default'] = dispatchEvent;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	exports.default = dispatchEvent;
 
 	var _customEvent = __webpack_require__(4);
 
 	var _customEvent2 = _interopRequireDefault(_customEvent);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/**
 	 * dispatch custom events
@@ -683,9 +689,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param  {string}  type       custom event name
 	 * @param  {object}  detail     custom detail information
 	 */
-
 	function dispatchEvent(target, type, detail) {
-	    var event = new _customEvent2['default'](type, {
+	    var event = new _customEvent2.default(type, {
 	        bubbles: true,
 	        cancelable: true,
 	        detail: detail
@@ -693,8 +698,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    target.dispatchEvent(event);
 	}
-
-	module.exports = exports['default'];
 
 /***/ },
 /* 4 */
@@ -757,10 +760,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports['default'] = {
+	exports.default = {
 	  /**
 	   * slides scrolled at once
 	   * @slidesToScroll {Number}
@@ -843,7 +846,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  enableMouseEvents: false
 	};
-	module.exports = exports['default'];
 
 /***/ }
 /******/ ])
