@@ -63,7 +63,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /* globals jQuery */
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -83,8 +83,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _defaults2 = _interopRequireDefault(_defaults);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _instanceof(left, right) { if (right != null && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return left instanceof right; } } /* globals jQuery */
 
 	var slice = Array.prototype.slice;
 
@@ -110,7 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * if object is jQuery convert to native DOM element
 	     */
-	    if (typeof jQuery !== 'undefined' && _instanceof(slider, jQuery)) {
+	    if (typeof jQuery !== 'undefined' && slider instanceof jQuery) {
 	        slider = slider[0];
 	    }
 
@@ -337,7 +335,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            slideContainer.addEventListener('click', onClick);
 	        }
 
-	        window.addEventListener('resize', onResize);
+	        options.window.addEventListener('resize', onResize);
 
 	        dispatchSliderEvent('after', 'init');
 	    }
@@ -386,7 +384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * returnIndex function: called on clickhandler
 	     */
 	    function returnIndex() {
-	        return index;
+	        return index - options.infinite || 0;
 	    }
 
 	    /**
@@ -415,8 +413,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // remove event listeners
 	        slideContainer.removeEventListener(prefixes.transitionEnd, onTransitionEnd);
 	        slideContainer.removeEventListener('touchstart', onTouchstart);
+	        slideContainer.removeEventListener('touchmove', onTouchmove);
+	        slideContainer.removeEventListener('touchend', onTouchend);
+	        slideContainer.removeEventListener('mousemove', onTouchmove);
+	        slideContainer.removeEventListener('mousedown', onTouchstart);
+	        slideContainer.removeEventListener('mouseup', onTouchend);
+	        slideContainer.removeEventListener('mouseleave', onTouchend);
+	        slideContainer.removeEventListener('click', onClick);
 
-	        window.removeEventListener('resize', onResize);
+	        options.window.removeEventListener('resize', onResize);
 
 	        if (prevCtrl) {
 	            prevCtrl.removeEventListener('click', prev);
@@ -565,11 +570,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function onResize(event) {
+	        reset();
+
 	        dispatchSliderEvent('on', 'resize', {
 	            event: event
 	        });
-
-	        reset();
 	    }
 
 	    // trigger initial setup
@@ -828,7 +833,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * enables mouse events for swiping on desktop devices
 	   * @enableMouseEvents {boolean}
 	   */
-	  enableMouseEvents: false
+	  enableMouseEvents: false,
+
+	  /**
+	   * window instance
+	   * @window {object}
+	   */
+	  window: window
 	};
 
 /***/ }
