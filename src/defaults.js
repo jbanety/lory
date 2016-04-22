@@ -43,6 +43,12 @@ export default {
      * @infinite {number}
      */
     infinite: false,
+    
+    /**
+     * offset to add to the translation
+     * @translationOffset {Number}
+     */
+    translationOffset: 0,
 
     /**
      * class name for slider frame
