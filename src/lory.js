@@ -125,13 +125,14 @@ export function lory (slider, opts) {
             rewind,
             rewindSpeed,
             ease,
-            classNameActiveSlide
+            classNameActiveSlide,
+            translationOffset
         } = options;
 
         let duration = slideSpeed;
 
         const nextSlide = direction ? index + 1 : index - 1;
-        const maxOffset = Math.round(slidesWidth - frameWidth);
+        const maxOffset = Math.round(slidesWidth - frameWidth) + translationOffset;
 
         dispatchSliderEvent('before', 'slide', {
             index,
@@ -152,10 +153,10 @@ export function lory (slider, opts) {
             nextIndex += infinite;
         }
 
-        let nextOffset = Math.min(Math.max(slides[nextIndex].offsetLeft * -1, maxOffset * -1), 0);
+        let nextOffset = Math.min(Math.max(slides[nextIndex].offsetLeft * -1 + translationOffset, maxOffset * -1), 0);
 
         if (rewind && Math.abs(position.x) === maxOffset && direction) {
-            nextOffset = 0;
+            nextOffset = translationOffset;
             nextIndex = 0;
             duration = rewindSpeed;
         }
@@ -178,7 +179,7 @@ export function lory (slider, opts) {
             index = nextIndex;
         }
 
-        if (infinite && (Math.abs(nextOffset) === maxOffset || Math.abs(nextOffset) === 0)) {
+        if (infinite && (Math.abs(nextOffset) === maxOffset || Math.abs(nextOffset) === translationOffset)) {
             if (direction) {
                 index = infinite;
             }
@@ -190,7 +191,7 @@ export function lory (slider, opts) {
             position.x = slides[index].offsetLeft * -1;
 
             transitionEndCallback = function () {
-                translate(slides[index].offsetLeft * -1, 0, undefined);
+                translate(slides[index].offsetLeft * -1 + translationOffset, 0, undefined);
             };
         }
 
@@ -266,7 +267,7 @@ export function lory (slider, opts) {
      * reset function: called on resize
      */
     function reset () {
-        const {infinite, ease, rewindSpeed} = options;
+        const {infinite, ease, rewindSpeed, translationOffset} = options;
 
         slidesWidth = slideContainer.getBoundingClientRect()
             .width || slideContainer.offsetWidth;
@@ -282,12 +283,12 @@ export function lory (slider, opts) {
         index = 0;
 
         if (infinite) {
-            translate(slides[index + infinite].offsetLeft * -1, 0, null);
+            translate(slides[index + infinite].offsetLeft * -1 + translationOffset, 0, null);
 
             index = index + infinite;
             position.x = slides[index].offsetLeft * -1;
         } else {
-            translate(0, rewindSpeed, ease);
+            translate(translationOffset, rewindSpeed, ease);
         }
     }
 
@@ -401,6 +402,7 @@ export function lory (slider, opts) {
     function onTouchmove (event) {
         const touches = event.touches ? event.touches[0] : event;
         const {pageX, pageY} = touches;
+        const {translationOffset} = options;
 
         delta = {
             x: pageX - touchOffset.x,
@@ -413,7 +415,7 @@ export function lory (slider, opts) {
 
         if (!isScrolling && touchOffset) {
             event.preventDefault();
-            translate(position.x + delta.x, 0, null);
+            translate(position.x + delta.x + translationOffset, 0, null);
         }
 
         // may be
@@ -423,6 +425,8 @@ export function lory (slider, opts) {
     }
 
     function onTouchend (event) {
+        const {translationOffset} = options;
+        
         /**
          * time between touchstart and touchend in milliseconds
          * @duration {number}
@@ -462,7 +466,7 @@ export function lory (slider, opts) {
             if (isValid && !isOutOfBounds) {
                 slide(false, direction);
             } else {
-                translate(position.x, options.snapBackSpeed);
+                translate(position.x + translationOffset, options.snapBackSpeed);
             }
         }
 
