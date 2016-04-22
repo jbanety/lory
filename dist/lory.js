@@ -210,12 +210,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var rewindSpeed = _options3.rewindSpeed;
 	        var ease = _options3.ease;
 	        var classNameActiveSlide = _options3.classNameActiveSlide;
-
+            var translationOffset = _options3.translationOffset;
 
 	        var duration = slideSpeed;
 
 	        var nextSlide = direction ? index + 1 : index - 1;
-	        var maxOffset = Math.round(slidesWidth - frameWidth);
+	        var maxOffset = Math.round(slidesWidth - frameWidth) + translationOffset;
 
 	        dispatchSliderEvent('before', 'slide', {
 	            index: index,
@@ -236,10 +236,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            nextIndex += infinite;
 	        }
 
-	        var nextOffset = Math.min(Math.max(slides[nextIndex].offsetLeft * -1, maxOffset * -1), 0);
+	        var nextOffset = Math.min(Math.max(slides[nextIndex].offsetLeft * -1 + translationOffset, maxOffset * -1), 0);
 
 	        if (rewind && Math.abs(position.x) === maxOffset && direction) {
-	            nextOffset = 0;
+	            nextOffset = translationOffset;
 	            nextIndex = 0;
 	            duration = rewindSpeed;
 	        }
@@ -262,7 +262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            index = nextIndex;
 	        }
 
-	        if (infinite && (Math.abs(nextOffset) === maxOffset || Math.abs(nextOffset) === 0)) {
+	        if (infinite && (Math.abs(nextOffset) === maxOffset || Math.abs(nextOffset) === translationOffset)) {
 	            if (direction) {
 	                index = infinite;
 	            }
@@ -274,7 +274,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            position.x = slides[index].offsetLeft * -1;
 
 	            transitionEndCallback = function transitionEndCallback() {
-	                translate(slides[index].offsetLeft * -1, 0, undefined);
+	                translate(slides[index].offsetLeft * -1 + translationOffset, 0, undefined);
 	            };
 	        }
 
@@ -354,6 +354,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var infinite = _options5.infinite;
 	        var ease = _options5.ease;
 	        var rewindSpeed = _options5.rewindSpeed;
+	        var translationOffset = _options5.translationOffset;
 
 
 	        slidesWidth = slideContainer.getBoundingClientRect().width || slideContainer.offsetWidth;
@@ -368,12 +369,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        index = 0;
 
 	        if (infinite) {
-	            translate(slides[index + infinite].offsetLeft * -1, 0, null);
+	            translate(slides[index + infinite].offsetLeft * -1 + translationOffset, 0, null);
 
 	            index = index + infinite;
 	            position.x = slides[index].offsetLeft * -1;
 	        } else {
-	            translate(0, rewindSpeed, ease);
+	            translate(translationOffset, rewindSpeed, ease);
 	        }
 	    }
 
@@ -492,7 +493,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var touches = event.touches ? event.touches[0] : event;
 	        var pageX = touches.pageX;
 	        var pageY = touches.pageY;
-
+            var _options7 = options;
+	        var translationOffset = _options7.translationOffset;
 
 	        delta = {
 	            x: pageX - touchOffset.x,
@@ -505,7 +507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (!isScrolling && touchOffset) {
 	            event.preventDefault();
-	            translate(position.x + delta.x, 0, null);
+	            translate(position.x + delta.x + translationOffset, 0, null);
 	        }
 
 	        // may be
@@ -515,6 +517,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function onTouchend(event) {
+	        var _options8 = options;
+	        var translationOffset = _options8.translationOffset;
+
 	        /**
 	         * time between touchstart and touchend in milliseconds
 	         * @duration {number}
@@ -551,7 +556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (isValid && !isOutOfBounds) {
 	                slide(false, direction);
 	            } else {
-	                translate(position.x, options.snapBackSpeed);
+	                translate(position.x + translationOffset, options.snapBackSpeed);
 	            }
 	        }
 
@@ -805,6 +810,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @infinite {number}
 	   */
 	  infinite: false,
+	  
+	  /**
+	   * offset to add to the translation
+	   * @translationOffset {Number}
+	   */
+	  translationOffset: 0,
 
 	  /**
 	   * class name for slider frame
